@@ -6,6 +6,7 @@
 	"Parameters": {
 		"KeyName": {
 			"Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+			"Default": "manoj-ohio-kp",
 			"Type": "AWS::EC2::KeyPair::KeyName",
 			"ConstraintDescription": "must be the name of an existing EC2 KeyPair."
 		},
@@ -48,6 +49,7 @@
 
 		"DBUser": {
 			"NoEcho": "true",
+			"Default": "admin",
 			"Description": "The WordPress database admin account username",
 			"Type": "String",
 			"MinLength": "1",
@@ -58,6 +60,7 @@
 
 		"DBPassword": {
 			"NoEcho": "true",
+			"Default": "password",
 			"Description": "The WordPress database admin account password",
 			"Type": "String",
 			"MinLength": "8",
@@ -995,7 +998,10 @@
 			"Type": "AWS::AutoScaling::AutoScalingGroup",
 			"Properties": {
 				"VPCZoneIdentifier": [{
-						"Ref": "ManojPrivateSubnet1"
+						"Ref": "ManojPublicSubnet1"
+					},
+					{
+						"Ref": "ManojPublicSubnet2"
 					}
 				],
 				"LaunchConfigurationName": {
