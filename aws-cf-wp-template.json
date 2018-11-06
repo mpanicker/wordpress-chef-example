@@ -1244,7 +1244,7 @@
 								}
 							},
 							"03_init_berkshelf": {
-								"command": "berks install",
+								"command": "berks init /var/chef/chef-repo/cookbooks/wordpress-chef-cookbook --skip-vagrant --skip-git",
 								"cwd": "/var/chef/chef-repo/cookbooks/wordpress-chef-cookbook",
 								"env": {
 									"HOME": "/var/chef"
