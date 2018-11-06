@@ -777,7 +777,7 @@
 				}
 			}
 		},
-		
+
 		"EIP": {
 			"Type": "AWS::EC2::EIP",
 			"DependsOn": "AttachGateway",
@@ -785,7 +785,7 @@
 				"Domain": "ManojVPC"
 			}
 		},
-		
+
 		"NAT": {
 			"DependsOn": "AttachGateway",
 			"Type": "AWS::EC2::NatGateway",
@@ -798,42 +798,42 @@
 				}
 			}
 		},
-		 "PrivateRouteTable": {
-            "Properties": {
-                "VpcId": {
-                    "Ref": "ManojVPC"
-                }
-            },
-            "Type": "AWS::EC2::RouteTable"
-        },
-		
+		"PrivateRouteTable": {
+			"Properties": {
+				"VpcId": {
+					"Ref": "ManojVPC"
+				}
+			},
+			"Type": "AWS::EC2::RouteTable"
+		},
+
 		"NatRoute": {
-            "Properties": {
-                "DestinationCidrBlock": "0.0.0.0/0",
-                "NatGatewayId": {
-                    "Ref": "NAT"
-                },
-                "RouteTableId": {
-                    "Ref": "PrivateRouteTable"
-                }
-            },
-            "Type": "AWS::EC2::Route",
+			"Properties": {
+				"DestinationCidrBlock": "0.0.0.0/0",
+				"NatGatewayId": {
+					"Ref": "NAT"
+				},
+				"RouteTableId": {
+					"Ref": "PrivateRouteTable"
+				}
+			},
+			"Type": "AWS::EC2::Route",
 			"DependsOn": "PrivateRouteTable"
-        },
-		
-		 "PrivateRouteAssociation": {
-            "Properties": {
-                "RouteTableId": {
-                    "Ref": "PrivateRouteTable"
-                },
-                "SubnetId": {
-                    "Ref": "ManojPrivateSubnet1"
-                }
-            },
-            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+		},
+
+		"PrivateRouteAssociation": {
+			"Properties": {
+				"RouteTableId": {
+					"Ref": "PrivateRouteTable"
+				},
+				"SubnetId": {
+					"Ref": "ManojPrivateSubnet1"
+				}
+			},
+			"Type": "AWS::EC2::SubnetRouteTableAssociation",
 			"DependsOn": "NatRoute"
-        },
-		
+		},
+
 		"LogRole": {
 			"Type": "AWS::IAM::Role",
 			"Properties": {
@@ -999,8 +999,7 @@
 			"Properties": {
 				"VPCZoneIdentifier": [{
 						"Ref": "ManojPublicSubnet1"
-					},
-					{
+					}, {
 						"Ref": "ManojPublicSubnet2"
 					}
 				],
@@ -1037,7 +1036,7 @@
 			"Metadata": {
 				"AWS::CloudFormation::Init": {
 					"configSets": {
-						"wordpress_install": ["install_cfn", "install_chefdk", "install_chef", "install_wordpress", "run_chef", "install_logs"]
+						"wordpress_install": ["install_cfn", "install_chefdk", "install_chef", "install_wordpress", "run_chef"]
 					},
 					"install_cfn": {
 						"files": {
@@ -1133,8 +1132,11 @@
 							"01_make_chef_readable": {
 								"command": "chmod +rx /var/chef"
 							},
-							"02_install_chef": {
-								"command": "bash /tmp/install.sh",
+							"02A_make_chef_executable": {
+								"command": "chmod +rx /tmp/install.sh"
+							},
+							"02B_install_chef_12": {
+								"command": "bash /tmp/install.sh -v 12.19.36",
 								"cwd": "/var/chef"
 							},
 							"03_create_node_list": {
@@ -1164,104 +1166,6 @@
 							}
 						}
 					},
-					"install_logs": {
-						"packages": {
-							"yum": {
-								"awslogs": []
-							}
-						},
-
-						"files": {
-							"/etc/awslogs/awslogs.conf": {
-								"content": {
-									"Fn::Join": ["", [
-											"[general]\n",
-											"state_file= /var/awslogs/state/agent-state\n",
-
-											"[/var/log/cloud-init.log]\n",
-											"file = /var/log/cloud-init.log\n",
-											"log_group_name = ", {
-												"Ref": "CloudFormationLogs"
-											}, "\n",
-											"log_stream_name = {instance_id}/cloud-init.log\n",
-											"datetime_format = \n",
-
-											"[/var/log/cloud-init-output.log]\n",
-											"file = /var/log/cloud-init-output.log\n",
-											"log_group_name = ", {
-												"Ref": "CloudFormationLogs"
-											}, "\n",
-											"log_stream_name = {instance_id}/cloud-init-output.log\n",
-											"datetime_format = \n",
-
-											"[/var/log/cfn-init.log]\n",
-											"file = /var/log/cfn-init.log\n",
-											"log_group_name = ", {
-												"Ref": "CloudFormationLogs"
-											}, "\n",
-											"log_stream_name = {instance_id}/cfn-init.log\n",
-											"datetime_format = \n",
-
-											"[/var/log/cfn-hup.log]\n",
-											"file = /var/log/cfn-hup.log\n",
-											"log_group_name = ", {
-												"Ref": "CloudFormationLogs"
-											}, "\n",
-											"log_stream_name = {instance_id}/cfn-hup.log\n",
-											"datetime_format = \n",
-
-											"[/var/log/cfn-wire.log]\n",
-											"file = /var/log/cfn-wire.log\n",
-											"log_group_name = ", {
-												"Ref": "CloudFormationLogs"
-											}, "\n",
-											"log_stream_name = {instance_id}/cfn-wire.log\n",
-											"datetime_format = \n",
-
-											"[/var/log/httpd]\n",
-											"file = /var/log/httpd/*\n",
-											"log_group_name = ", {
-												"Ref": "CloudFormationLogs"
-											}, "\n",
-											"log_stream_name = {instance_id}/httpd\n",
-											"datetime_format = %d/%b/%Y:%H:%M:%S\n"
-										]]
-								},
-								"mode": "000444",
-								"owner": "root",
-								"group": "root"
-							},
-							"/etc/awslogs/awscli.conf": {
-								"content": {
-									"Fn::Join": ["", [
-											"[plugins]\n",
-											"cwlogs = cwlogs\n",
-											"[default]\n",
-											"region = ", {
-												"Ref": "AWS::Region"
-											}, "\n"
-										]]
-								},
-								"mode": "000444",
-								"owner": "root",
-								"group": "root"
-							}
-						},
-						"commands": {
-							"01_create_state_directory": {
-								"command": "mkdir -p /var/awslogs/state"
-							}
-						},
-						"services": {
-							"sysvinit": {
-								"awslogs": {
-									"enabled": "true",
-									"ensureRunning": "true",
-									"files": ["/etc/awslogs/awslogs.conf"]
-								}
-							}
-						}
-					},
 					"install_wordpress": {
 						"files": {
 							"/var/chef/chef-repo/.chef/knife.rb": {
@@ -1269,7 +1173,7 @@
 									"Fn::Join": [
 										"",
 										[
-											"cookbook_path [ '/var/chef/chef-repo/cookbooks/wordpress/berks-cookbooks' ]\n",
+											"cookbook_path [ '/var/chef/chef-repo/cookbooks/wordpress-chef-cookbook/berks-cookbooks' ]\n",
 											"node_path [ '/var/chef/chef-repo/nodes' ]\n"
 										]
 									]
@@ -1283,7 +1187,7 @@
 									"Fn::Join": [
 										"",
 										[
-											"cookbook_path [ '/var/chef/chef-repo/cookbooks/wordpress/berks-cookbooks' ]\n",
+											"cookbook_path [ '/var/chef/chef-repo/cookbooks/wordpress-chef-cookbook/berks-cookbooks' ]\n",
 											"node_path [ '/var/chef/chef-repo/nodes' ]\n"
 										]
 									]
@@ -1292,7 +1196,7 @@
 								"owner": "root",
 								"group": "root"
 							},
-							"/var/chef/chef-repo/cookbooks/wordpress/attributes/aws_rds_config.rb": {
+							"/var/chef/chef-repo/cookbooks/wordpress-chef-cookbook/attributes/aws_rds_config.rb": {
 								"content": {
 									"Fn::Join": [
 										"",
@@ -1325,27 +1229,30 @@
 							}
 						},
 						"commands": {
-							"01_get_cookbook": {
-								"command": "knife cookbook site download wordpress",
+							"00_get_git": {
+								"command": "yum -y install git ",
 								"cwd": "/var/chef/chef-repo",
 								"env": {
 									"HOME": "/var/chef"
 								}
 							},
-							"02_unpack_cookbook": {
-								"command": "tar xvfz /var/chef/chef-repo/wordpress*",
-								"cwd": "/var/chef/chef-repo/cookbooks"
+							"01_get_cookbook": {
+								"command": "git clone https://github.com/mpanicker/wordpress-chef-cookbook.git",
+								"cwd": "/var/chef/chef-repo/cookbooks",
+								"env": {
+									"HOME": "/var/chef"
+								}
 							},
 							"03_init_berkshelf": {
-								"command": "berks init /var/chef/chef-repo/cookbooks/wordpress --skip-vagrant --skip-git",
-								"cwd": "/var/chef/chef-repo/cookbooks/wordpress",
+								"command": "berks install",
+								"cwd": "/var/chef/chef-repo/cookbooks/wordpress-chef-cookbook",
 								"env": {
 									"HOME": "/var/chef"
 								}
 							},
 							"04_vendorize_berkshelf": {
 								"command": "berks vendor",
-								"cwd": "/var/chef/chef-repo/cookbooks/wordpress",
+								"cwd": "/var/chef/chef-repo/cookbooks/wordpress-chef-cookbook",
 								"env": {
 									"HOME": "/var/chef"
 								}
