@@ -1,4 +1,4 @@
-#Cloud Formation template(aws-cf-wp-template.json)  will do the following things
+# Cloud Formation template(aws-cf-wp-template.json)  will do the following things
 -Create a new Vpc
 -Attach an Internet Gateway to the VPC
 -Create 2 Public and 2 Private Subnets within the VPC
@@ -13,5 +13,5 @@
 -Create Security Groups that let in ssh(22) and http(80) traffic into the ALB and EC2 instances
 -Create Security Group that lets in RDP(3306) traffic from the EC2 instances into the RDS MySQL DB
 
-##Known issues
+## Known issues
 The Wordpress Chef cookbook does not fully work. The database recipe in recipes folder (database.rb) throws a mysql_service error. If we comment the database recipe in app.rb then it throws a apache user id not found error
