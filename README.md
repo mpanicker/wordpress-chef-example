@@ -18,10 +18,10 @@ The Wordpress Chef cookbook does not fully work. The database recipe in recipes 
 
 
 # Cloud Formation template(aws-cf-wp-no-chef.json)  will do the following things
-1. all the things that aws-cf-wp-template.json with following exceptions
-a. It puts the EC2 instances in a private subnet
-b. It provides a Bastion host to log into the private EC2 instances if needed
-c. It does not use Chef to install WordPress
+All the things that aws-cf-wp-template.json with following exceptions
+1. It puts the EC2 instances in a private subnet
+2. It provides a Bastion host to log into the private EC2 instances if needed
+3. It does not use Chef to install WordPress
 
 ## Known issues
 None :-)
