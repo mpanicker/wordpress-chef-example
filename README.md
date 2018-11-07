@@ -15,3 +15,13 @@
 
 ## Known issues
 The Wordpress Chef cookbook does not fully work. The database recipe in recipes folder (database.rb) throws a mysql_service error. If we comment the database recipe in app.rb then it throws a apache user id not found error
+
+
+# Cloud Formation template(aws-cf-wp-no-chef.json)  will do the following things
+1. all the things that aws-cf-wp-template.json with following exceptions
+a. It puts the EC2 instances in a private subnet
+b. It provides a Bastion host to log into the private EC2 instances if needed
+c. It does not use Chef to install WordPress
+
+## Known issues
+None :-)
